@@ -21,9 +21,7 @@
  - ~ansible-playbook -i inventory/gce-inventory.gcp.yml destroy.yml~
 
 * Customization
- - can customize the following vars:
-  - ~instance_name_1: free-1~ , instance name
-  - ~image: projects/ubuntu-os-cloud/global/images/family/ubuntu-1604-lts~ , operating system image to use
+ - The vars in ~group_vars/gce~ can be customized
 
 * TODO: maybe some or maybe none
  - gcp setup (inventory, project, keys, roles, firewall rules, etc... )

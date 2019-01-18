@@ -19,8 +19,8 @@
   tasks:
    - name: create a disk
      gcp_compute_disk:
-         name: 'free-disk-instance'
-         size_gb: 30
+         name: "{{ disk_name }}"
+         size_gb: "{{ disk_size }}"
          source_image: "{{ image }}"
          zone: "{{ zone }}"
          project: "{{ project_id }}"
@@ -32,7 +32,7 @@
      register: disk
    - name: create a network
      gcp_compute_network:
-         name: 'free-network-instance'
+         name: "{{ network_name }}"
          project: "{{ project_id }}"
          auth_kind: "{{ auth }}"
          service_account_file: "{{ credentials_file }}"
@@ -42,7 +42,7 @@
      register: network
    - name: create a firewall rule
      gcp_compute_firewall:
-       name: 'free-ssh-instance'
+       name: "{{ ssh_firewall_name }}"
        allowed:
          - ip_protocol: tcp
            ports:
@@ -57,7 +57,7 @@
        state: present
    - name: create a address
      gcp_compute_address:
-         name: 'free-address-instance'
+         name: "{{ address_name }}"
          region: "{{ region }}"
          project: "{{ project_id }}"
          auth_kind: "{{ auth }}"
