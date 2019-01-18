@@ -1,0 +1,32 @@
+* Simple ansible playbooks to create and update a free instance
+  - GCP provides a (so far) permanent free tier of usage.
+
+* Getting started
+ - Ensure you have your gcp credentials and ssh-key. See [[https://docs.ansible.com/ansible/latest/scenario_guides/guide_gce.html][ansible docs]] for more info.
+ - Set the ~GCP_PROJECT~ & ~GCP_SERVICE_ACCOUNT_FILE~ env variables and replace ~inventory/gce-inventory.gcp.yml~ with the information.
+ - The env variables ~USER~ & ~SSH_PUB_KEY~ will be used for ssh login name and ssh pubkey file location.
+ - Run desired playbook using the GCE inventory.
+
+* Create instance
+ - ~ansible-playbook -i inventory/gce-inventory.gcp.yml provision.yml~
+   - Creates a ~f1-micro~ instance with ~30GiB~ disk in the ~us-east1-b~ zone with the name of ~free-1~.
+     Adds the ~http-server~, ~https-server~ and ~ssh-server~ tags for default firewall rules of Port ~80~, ~443~ and ~22~ respectively.
+     Adds the ~webserver~ tag for tracking.
+
+* Update instance
+ - ~ansible-playbook -i inventory/gce-inventory.gcp.yml rolling_update.yml~
+ - applies the common and web roles
+
+* Destroy instance
+ - ~ansible-playbook -i inventory/gce-inventory.gcp.yml destroy.yml~
+
+* Customization
+ - can customize the following vars:
+  - ~instance_name_1: free-1~ , instance name
+  - ~image: projects/ubuntu-os-cloud/global/images/family/ubuntu-1604-lts~ , operating system image to use
+
+* TODO: maybe some or maybe none
+ - gcp setup (inventory, project, keys, roles, firewall rules, etc... )
+ - include other free services allocations (storage bucket in ~US-CENTRAL1~ etc)
+ - multiple OS support in roles
+ - move to role based provisioning

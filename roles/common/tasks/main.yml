@@ -1,0 +1,5 @@
+---
+# This role contains common plays that will run on all nodes.
+
+- name: System update
+  apt: name=* state=latest force_apt_get=true

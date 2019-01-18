@@ -1,0 +1,17 @@
+- hosts: tag_webserver
+  serial: 1
+  become: true
+  # These are the tasks to run before applying updates:
+  #pre_tasks:
+  #- name: clear directory
+  #- file: path=/opt state=absent
+  #- file: path=/opt state=directory
+
+  roles:
+  - common
+  - web
+
+  # These tasks run after the roles:
+  #post_tasks:
+  #- name: wait for webserver to come up
+  #  wait_for: 'host={{ inventory_hostname }} port=80 state=started timeout=80'

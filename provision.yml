@@ -1,0 +1,101 @@
+---
+# Provision free gce instance:
+- name: Create instance(s)
+  hosts: localhost
+  gather_facts: no
+  connection: local
+
+  vars_files:
+  - group_vars/all
+  - group_vars/gce
+  vars:
+    credentials_file: "{{ lookup('env', 'GCP_SERVICE_ACCOUNT_FILE') }}"
+    project_id: "{{ lookup('env', 'GCP_PROJECT') }}"
+    ssh_pub_key_file: "{{ lookup('env','SSH_PUB_KEY') }}"
+    ssh_pub_key: "{{ lookup('file', ssh_pub_key_file) }}"
+    user: "{{ lookup('env', 'USER') }}"
+    metadata: "{'sshKeys': '{{ user }}:{{ ssh_pub_key }}'}"
+
+  tasks:
+   - name: create a disk
+     gcp_compute_disk:
+         name: 'free-disk-instance'
+         size_gb: 30
+         source_image: "{{ image }}"
+         zone: "{{ zone }}"
+         project: "{{ project_id }}"
+         auth_kind: "{{ auth }}"
+         service_account_file: "{{ credentials_file }}"
+         scopes:
+           - https://www.googleapis.com/auth/compute
+         state: present
+     register: disk
+   - name: create a network
+     gcp_compute_network:
+         name: 'free-network-instance'
+         project: "{{ project_id }}"
+         auth_kind: "{{ auth }}"
+         service_account_file: "{{ credentials_file }}"
+         scopes:
+           - https://www.googleapis.com/auth/compute
+         state: present
+     register: network
+   - name: create a firewall rule
+     gcp_compute_firewall:
+       name: 'free-ssh-instance'
+       allowed:
+         - ip_protocol: tcp
+           ports:
+             - 22
+       target_tags:
+         - ssh-server
+       project: "{{ project_id }}"
+       auth_kind: "{{ auth }}"
+       service_account_file: "{{ credentials_file }}"
+       network: "{{ network.selfLink }}"
+       source_ranges: '0.0.0.0/0'
+       state: present
+   - name: create a address
+     gcp_compute_address:
+         name: 'free-address-instance'
+         region: "{{ region }}"
+         project: "{{ project_id }}"
+         auth_kind: "{{ auth }}"
+         service_account_file: "{{ credentials_file }}"
+         scopes:
+           - https://www.googleapis.com/auth/compute
+         state: present
+     register: address
+   - name: create a instance
+     gcp_compute_instance:
+         state: present
+         metadata: "{{ metadata }}"
+         name: "{{ instance_name_1 }}"
+         machine_type: "{{ machine_type }}"
+         disks:
+           - auto_delete: true
+             boot: true
+             source: "{{ disk }}"
+         network_interfaces:
+             - network: "{{ network }}"
+               access_configs:
+                 - name: 'External NAT'
+                   nat_ip: "{{ address }}"
+                   type: 'ONE_TO_ONE_NAT'
+         zone: "{{ zone }}"
+         tags:
+           items:
+             - webserver
+             - http-server
+             - https-server
+             - ssh-server
+         project: "{{ project_id }}"
+         auth_kind: "{{ auth }}"
+         service_account_file: "{{ credentials_file }}"
+         scopes:
+           - https://www.googleapis.com/auth/compute
+     register: instance
+
+  post_tasks:
+    - name: Wait for SSH to come up
+      wait_for: host={{ address.address }} port=22 delay=10 timeout=60

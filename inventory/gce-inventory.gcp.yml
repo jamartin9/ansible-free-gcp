@@ -1,0 +1,11 @@
+plugin: gcp_compute
+projects:
+  - jamin-148202
+auth_kind: serviceaccount
+service_account_file: ~/.gcloud/jam.json
+scopes:
+  - https://www.googleapis.com/auth/compute
+keyed_groups:
+  - prefix: tag
+    key: tags['items']
+filters:

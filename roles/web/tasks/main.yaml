@@ -1,0 +1,8 @@
+---
+# This role contains web plays that will run on all nodes.
+
+- name: Install web server deps
+  apt: name={{ item }} state=present force_apt_get=true
+  with_items:
+   - git
+   - curl

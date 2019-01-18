@@ -1,0 +1,26 @@
+---
+# Destroys free gce instance.
+- name: Remove instance(s)
+  hosts: localhost
+  gather_facts: no
+  connection: local
+
+  vars_files:
+  - group_vars/all
+  - group_vars/gce
+  vars:
+    credentials_file: "{{ lookup('env', 'GCP_SERVICE_ACCOUNT_FILE') }}"
+    project_id: "{{ lookup('env', 'GCP_PROJECT') }}"
+
+  tasks:
+   - name: delete a instance
+     gcp_compute_instance:
+         state: absent
+         name: "{{ instance_name_1 }}"
+         zone: "{{ zone }}"
+         project: "{{ project_id }}"
+         auth_kind: "{{ auth }}"
+         service_account_file: "{{ credentials_file }}"
+         scopes:
+           - https://www.googleapis.com/auth/compute
+     tags: delete

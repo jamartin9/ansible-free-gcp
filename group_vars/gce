@@ -1,0 +1,7 @@
+machine_type: f1-micro
+image: projects/debian-cloud/global/images/family/debian-9
+zone: us-east1-b
+instance_name_1: free-1
+disk_size: 30
+auth: serviceaccount
+region: us-east1
