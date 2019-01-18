@@ -13,7 +13,7 @@
     project_id: "{{ lookup('env', 'GCP_PROJECT') }}"
 
   tasks:
-   - name: delete a instance
+   - name: delete the instance
      gcp_compute_instance:
          state: absent
          name: "{{ instance_name_1 }}"
@@ -24,10 +24,40 @@
          scopes:
            - https://www.googleapis.com/auth/compute
      tags: delete
-   - name: delete a address
+   - name: delete address free-address-instance
      gcp_compute_address:
          name: 'free-address-instance'
          region: "{{ region }}"
+         project: "{{ project_id }}"
+         auth_kind: "{{ auth }}"
+         service_account_file: "{{ credentials_file }}"
+         scopes:
+           - https://www.googleapis.com/auth/compute
+         state: absent
+   - name: delete firewall rule free-network-instance-allow-https
+     gcp_compute_firewall:
+       name: 'free-network-instance-allow-https'
+       project: "{{ project_id }}"
+       auth_kind: "{{ auth }}"
+       service_account_file: "{{ credentials_file }}"
+       state: absent
+   - name: delete firewall rule free-network-instance-allow-http
+     gcp_compute_firewall:
+       name: 'free-network-instance-allow-http'
+       project: "{{ project_id }}"
+       auth_kind: "{{ auth }}"
+       service_account_file: "{{ credentials_file }}"
+       state: absent
+   - name: delete firewall rule free-ssh-instance
+     gcp_compute_firewall:
+       name: 'free-ssh-instance'
+       project: "{{ project_id }}"
+       auth_kind: "{{ auth }}"
+       service_account_file: "{{ credentials_file }}"
+       state: absent
+   - name: delete network free-network-instance
+     gcp_compute_network:
+         name: 'free-network-instance'
          project: "{{ project_id }}"
          auth_kind: "{{ auth }}"
          service_account_file: "{{ credentials_file }}"
